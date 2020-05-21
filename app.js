@@ -12,7 +12,6 @@ mongoose.connect(process.env.MONGO_INFO, {
 
 app.use(checkAuth)
 app.use('/graphql', graphqlHTTP({
-    graphiql: true,
     schema: schema
 
 }))
