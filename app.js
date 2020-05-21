@@ -2,7 +2,7 @@ const express = require('express');
 const graphqlHTTP = require('express-graphql');
 const schema = require('./schema/schema')
 const mongoose = require('mongoose')
-const checkAuth = require('./middlewares/checkAuth')
+const checkAuth = require('./utils/checkAuth')
 const app = express();
 
 mongoose.connect(process.env.MONGO_INFO, {
