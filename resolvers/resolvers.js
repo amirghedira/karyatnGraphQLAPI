@@ -438,13 +438,13 @@ exports.sendRequest = async (parent, args, req) => {
                     if (args.subscribe && !manager.clients.includes(rent.client._id)) {
                         manager.clients.push(rent.client._id)
                         await manager.save()
-                        res.status(201).json({ message: 'Request accepted successfully' })
+                        return new Response(201, 'Request successfully sent')
                         return;
 
                     }
                     return new Response(201, 'Request successfully sent')
                 }
-                return new Response(201, 'Car already reserved')
+                return new Response(409, 'Car already reserved')
                 // res.status(409).json({ message: 'Car already reserved', fromdate: validDate.fromdate, todate: validDate.todate })
             }
             return new Response(404, 'Car not found')
