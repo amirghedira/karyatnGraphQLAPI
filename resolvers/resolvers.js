@@ -409,7 +409,7 @@ exports.sendRequest = async (parent, args, req) => {
                 })
                 if (validDate.state) {
                     const rent = new Rent({
-                        carid: car._id,
+                        car: car._id,
                         client: req.user._id,
                         owner: args.ownerid,
                         totalprice: args.totalprice,
@@ -432,7 +432,6 @@ exports.sendRequest = async (parent, args, req) => {
                             notifications: newNotification
                         }
                     })
-                    console.log(manager)
                     SendRequest(manager.email, manager.username, client.username, client._id)
                     socket.emit('sendnotification', { userid: rent.owner, notification: newNotification })
 
