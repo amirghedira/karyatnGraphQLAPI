@@ -10,13 +10,10 @@ const Response = class Response {
         console.log(cars.length)
         if (cars) {
             if (cars.length !== undefined) {
-                if (cars.length > 0)
-                    this.data.cars = cars
-                else {
-                    this.data.cars = null
-                }
+                this.data.cars = cars
+
             } else {
-                console.log(cars)
+
                 this.data.cars = [cars]
             }
         } else {
