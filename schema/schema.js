@@ -13,7 +13,7 @@ const {
 
 
 const resolvers = require('../resolvers/resolvers');
-const ResponseType = require('../types/responseType');
+const { ResponseType, ResponsePaginateType } = require('../types/responseType');
 const { logedUserType, userInfoType } = require('../types/types');
 
 const rootQuery = new GraphQLObjectType({
@@ -21,7 +21,11 @@ const rootQuery = new GraphQLObjectType({
     name: 'rootQuery',
     fields: () => ({
         allCars: {
-            type: ResponseType,
+            type: ResponsePaginateType,
+            args: {
+                page: { type: GraphQLNonNull(GraphQLString) },
+                limit: { type: GraphQLNonNull(GraphQLString) }
+            },
             resolve: resolvers.getallCars
         },
         car: {
@@ -33,11 +37,19 @@ const rootQuery = new GraphQLObjectType({
         }
         ,
         allRentedCars: {
-            type: ResponseType,
+            type: ResponsePaginateType,
+            args: {
+                page: { type: GraphQLNonNull(GraphQLString) },
+                limit: { type: GraphQLNonNull(GraphQLString) }
+            },
             resolve: resolvers.getAllRentedCars
         },
         allFreeCars: {
-            type: ResponseType,
+            type: ResponsePaginateType,
+            args: {
+                page: { type: GraphQLNonNull(GraphQLString) },
+                limit: { type: GraphQLNonNull(GraphQLString) }
+            },
             resolve: resolvers.getAllFreeCars
         },
         cars: {

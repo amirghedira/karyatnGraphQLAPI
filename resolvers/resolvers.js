@@ -6,20 +6,20 @@ const Car = require('../models/Car')
 const io = require('socket.io-client')
 const socket = io('http://karyatn.amir-ghedira.com');
 const { SendRequest, rentEnded, requestAccepted, declinedRequest } = require('../utils/sendMail')
-const Response = require('../types/Response')
+const { Response, ResponsePaginated } = require('../types/Response')
 
 
 
 
-exports.getallCars = async () => {
+exports.getallCars = async (parent, args) => {
     try {
-        // const allcars = await Car.find().populate('ownerid')
-        // return new Response(200, 'success', allcars)
-        return new Error('loolita')
+
+        const result = await Car.paginate({}, { page: +args.page, limit: +args.limit })
+        console.log(result.docs)
+        return new ResponsePaginated(200, 'success', result.docs, null, null, { total: result.total, pages: result.pages })
 
     } catch (error) {
-
-        return new Response(500, error.message)
+        return new ResponsePaginated(500, error.message)
     }
 }
 exports.getCar = async (parent, args) => {
@@ -32,32 +32,33 @@ exports.getCar = async (parent, args) => {
         else
             return new Response(404, 'car not found')
     } catch (error) {
-        console.log(error)
         return new Response(500, error.message)
     }
 }
 
-exports.getAllRentedCars = async () => {
+exports.getAllRentedCars = async (parent, args) => {
 
     try {
 
-        return await Car.find({ state: false }).populate('ownerid')
+        const result = await Car.paginate({ state: false }, { page: +args.page, limit: +args.limit })
+
+        return new ResponsePaginated(200, 'success', result.docs, null, null, { total: result.total, pages: result.pages })
 
     } catch (error) {
 
-        return new Response(500, error.message)
+        return new ResponsePaginated(500, error.message)
     }
 }
 
-exports.getAllFreeCars = async () => {
+exports.getAllFreeCars = async (parent, args) => {
     try {
 
-        const allfreeCars = await Car.find({ state: true }).populate('ownerid')
-        return new Response(200, 'success', allfreeCars)
+        const result = await Car.paginate({ state: true }, { page: +args.page, limit: +args.limit })
+        return new ResponsePaginated(200, 'success', result.docs, null, null, { total: result.total, pages: result.pages })
 
     } catch (error) {
 
-        return new Response(500, error.message)
+        return new ResponsePaginated(500, error.message)
     }
 }
 
@@ -244,7 +245,6 @@ exports.getManagers = async (parent, args) => {
         return new Response(200, 'success', null, docs)
 
     } catch (error) {
-        console.log(error)
         return new Response(500, error.message)
     }
 }

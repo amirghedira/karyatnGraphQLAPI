@@ -62,7 +62,7 @@ const carType = new GraphQLObjectType({
         doorscount: { type: GraphQLNonNull(GraphQLInt) },
         seatscount: { type: GraphQLNonNull(GraphQLInt) },
         state: { type: GraphQLNonNull(GraphQLBoolean) },
-        images: { type: GraphQLNonNull(GraphQLString) },
+        images: { type: GraphQLList(GraphQLNonNull(GraphQLString)) },
         address: { type: GraphQLNonNull(GraphQLString) },
         addedDate: { type: GraphQLNonNull(GraphQLString) },
         ownerid: { type: userType }
