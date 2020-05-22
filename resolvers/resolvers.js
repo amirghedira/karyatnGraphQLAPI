@@ -7,6 +7,7 @@ const io = require('socket.io-client')
 const socket = io('http://karyatn.amir-ghedira.com');
 const { SendRequest, rentEnded, requestAccepted, declinedRequest } = require('../utils/sendMail')
 const { Response, ResponsePaginated } = require('../types/Response')
+const cloudinary = require('../middleware/cloudinary')
 
 
 
