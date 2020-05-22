@@ -7,7 +7,6 @@ const Response = class Response {
 
         this.message = message
         this.status = status;
-        console.log(cars.length)
         if (cars) {
             if (cars.length !== undefined) {
                 this.data.cars = cars
@@ -19,8 +18,28 @@ const Response = class Response {
         } else {
             this.data.cars = null
         }
-        this.data.users = users ? !users.length ? [users] : users : null;
-        this.data.rents = rents ? !rents.length ? [rents] : rents : null;
+        if (users) {
+            if (users.length !== undefined) {
+                this.data.users = users
+
+            } else {
+
+                this.data.users = [users]
+            }
+        } else {
+            this.data.users = null
+        }
+        if (rents) {
+            if (rents.length !== undefined) {
+                this.data.rents = rents
+
+            } else {
+
+                this.data.rents = [rents]
+            }
+        } else {
+            this.data.rents = null
+        }
     }
 }
 
