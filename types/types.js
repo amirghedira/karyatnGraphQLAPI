@@ -65,7 +65,8 @@ const carType = new GraphQLObjectType({
         images: { type: GraphQLList(GraphQLNonNull(GraphQLString)) },
         address: { type: GraphQLNonNull(GraphQLString) },
         addedDate: { type: GraphQLNonNull(GraphQLString) },
-        ownerid: { type: userType }
+        percentage: { type: GraphQLList(GraphQLInt) },
+        owner: { type: userType }
     })
 })
 
@@ -74,9 +75,9 @@ const rentType = new GraphQLObjectType({
     fields: () => ({
 
         _id: { type: GraphQLNonNull(GraphQLString) },
-        carid: { type: GraphQLNonNull(carType) },
-        clientid: { type: GraphQLNonNull(userType) },
-        ownerid: { type: GraphQLNonNull(userType) },
+        car: { type: GraphQLNonNull(carType) },
+        client: { type: GraphQLNonNull(userType) },
+        owner: { type: GraphQLNonNull(userType) },
         totalprice: { type: GraphQLNonNull(GraphQLFloat) },
         from: { type: GraphQLNonNull(GraphQLString) },
         to: { type: GraphQLNonNull(GraphQLString) },
