@@ -112,9 +112,9 @@ exports.getCarHistory = async (parent, args, req) => {
     if (req.isAuth) {
         try {
 
-            const carHistory = await Rent.find({ $and: [{ carid: args.carid }, { ended: true }] }).populate([{
+            const carHistory = await Rent.find({ $and: [{ car: args.carid }, { ended: true }] }).populate([{
                 path: 'client'
-            }, { path: 'carid' }, { path: 'owner' }])
+            }, { path: 'car' }, { path: 'owner' }])
 
             return new Response(200, 'success', null, null, carHistory)
         } catch (error) {
@@ -130,7 +130,7 @@ exports.getActiveRents = async (parent, args, req) => {
         try {
             const activeRents = await Rent.find({ $and: [{ owner: req.user._id }, { active: true }] }).populate([{
                 path: 'client'
-            }, { path: 'carid' }, { path: 'owner' }])
+            }, { path: 'car' }, { path: 'owner' }])
 
             return new Response(200, 'success', null, null, activeRents)
 
@@ -149,7 +149,7 @@ exports.getUnvalidatedRents = async (parent, args, req) => {
 
             const unvalidatedRents = await Rent.find({ $and: [{ owner: req.user._id }, { validated: false }] }).populate([{
                 path: 'client'
-            }, { path: 'carid' }, { path: 'owner' }])
+            }, { path: 'car' }, { path: 'owner' }])
             return new Response(200, 'success', null, null, unvalidatedRents)
         } catch (error) {
 
@@ -166,7 +166,7 @@ exports.getReservations = async (parent, args, req) => {
             const reservations = await Rent.find({ $and: [{ owner: req.user._id }, { validated: true }, { ended: false }] })
                 .populate([{
                     path: 'client'
-                }, { path: 'carid' }, { path: 'owner' }])
+                }, { path: 'car' }, { path: 'owner' }])
 
             return new Response(200, 'success', null, null, reservations)
         } catch (error) {
@@ -301,7 +301,7 @@ exports.getArchive = async (parent, args, req) => {
     if (req.isAuth) {
         try {
             const archives = await Rent.find({ $and: [{ owner: req.user._id }, { ended: true }] })
-                .populate([{ path: 'client' }, { path: 'owner' }, { path: 'carid' }])
+                .populate([{ path: 'client' }, { path: 'owner' }, { path: 'car' }])
             return new Response(200, 'success', null, null, archives)
         } catch (error) {
             return new Response(500, error.message)
@@ -345,7 +345,7 @@ exports.deleteCar = async (parent, args, req) => {
                 user.cars.splice(index, 1)
                 await user.save()
                 await Car.deleteOne({ _id: args._id })
-                await Rent.deleteMany({ carid: args._id })
+                await Rent.deleteMany({ car: args._id })
                 return new Response(200, 'car successfully deleted')
             }
 
@@ -367,7 +367,7 @@ deleteReservation = async (parent, args, req) => {
                 const newNotifcation = {
                     _id: new mongoose.Types.ObjectId(),
                     userid: reservation.owner,
-                    carid: reservation.carid,
+                    carid: reservation.car,
                     type: 'reservationdeleted',
                     read: false
                 }
@@ -398,7 +398,7 @@ exports.sendRequest = async (parent, args, req) => {
         try {
             const car = await Car.findOne({ _id: args.carid })
             if (car) {
-                const rents = await Rent.find({ carid: car._id })
+                const rents = await Rent.find({ car: car._id })
                 let validDate = { state: true, fromdate: null, todate: null };
                 rents.forEach(rent => {
                     if (!rent.ended && rent.validated && new Date(args.fromdate).getTime() <= new Date(rent.to).getTime() && new Date(args.fromdate).getTime() >= new Date(rent.from).getTime()) {
@@ -464,13 +464,13 @@ exports.validateRequest = async (parent, args, req) => {
         try {
             let rent = await Rent.findOne({ _id: args._id }).populate([{
                 path: 'client'
-            }, { path: 'carid' }, { path: 'owner' }])
+            }, { path: 'car' }, { path: 'owner' }])
             rent.validated = true;
             await rent.save()
             const NewNotification = {
                 _id: new mongoose.Types.ObjectId(),
                 userid: rent.owner,
-                carid: rent.carid,
+                carid: rent.car,
                 type: 'requestaccepted',
                 read: false,
                 date: new Date().toISOString()
@@ -483,7 +483,7 @@ exports.validateRequest = async (parent, args, req) => {
             socket.emit('sendnotification', { userid: rent.client._id, notification: NewNotification })
             setTimeout(() => activateRentHandler(rent._id), new Date(rent.from).getTime() - new Date().getTime());
             setTimeout(() => endRentHandler(rent._id), new Date(rent.to).getTime() - new Date().getTime());
-            requestAccepted(rent.client.email, rent.client.username, rent.owner._id, rent.carid.carnumber, rent.daterent, rent.owner.agencename)
+            requestAccepted(rent.client.email, rent.client.username, rent.owner._id, rent.car.carnumber, rent.daterent, rent.owner.agencename)
 
 
             return new Response(200, 'Request accepted successfully')
@@ -505,16 +505,16 @@ exports.declineRequest = async (parent, args, req) => {
 
             const rent = await Rent.findById(args._id).populate([{
                 path: 'client'
-            }, { path: 'carid' }, { path: 'owner' }])
+            }, { path: 'car' }, { path: 'owner' }])
             const newNotifcation = {
                 _id: new mongoose.Types.ObjectId(),
                 userid: rent.owner,
-                carid: rent.carid,
+                carid: rent.car,
                 type: 'declinedrequest',
                 read: false
             }
             await User.updateOne({ _id: rent.client._id }, { $push: { notifications: newNotifcation } })
-            declinedRequest(rent.client.email, rent.client.username, rent.owner._id, rent.carid._id)
+            declinedRequest(rent.client.email, rent.client.username, rent.owner._id, rent.car._id)
             socket.emit('sendnotification', { userid: rent.client._id, notification: newNotifcation })
             await Rent.deleteOne({ _id: args._id })
 
@@ -535,14 +535,14 @@ exports.endRent = async (rentid) => {
     const rent = await Rent.findById(rentid)
         .populate([{
             path: 'client'
-        }, { path: 'carid' }, { path: 'owner' }])
+        }, { path: 'car' }, { path: 'owner' }])
     rent.active = false;
     rent.ended = true;
     await rent.save();
     const clientNewNotification = {
         _id: new mongoose.Types.ObjectId(),
         userid: rent.owner,
-        carid: rent.carid,
+        carid: rent.car,
         type: 'rentended',
         read: false,
         date: new Date().toISOString()
@@ -556,7 +556,7 @@ exports.endRent = async (rentid) => {
     const managerNewNotification = {
         _id: new mongoose.Types.ObjectId(),
         userid: rent.client,
-        carid: rent.carid,
+        carid: rent.car,
         type: 'rentended',
         read: false,
         date: new Date().toISOString()
@@ -568,10 +568,10 @@ exports.endRent = async (rentid) => {
     })
     socket.emit('sendnotification', { userid: rent.owner._id, notification: managerNewNotification })
 
-    await Car.updateOne({ _id: rent.carid }, { $set: { state: true } })
+    await Car.updateOne({ _id: rent.car }, { $set: { state: true } })
 
     rentEnded(rent.client.email, rent.client.username, manager._id, car._id, car.carnumber)
-    rentEnded(rent.owner.email, rent.owner.username, rent.client.username, rent.carid.carnumber)
+    rentEnded(rent.owner.email, rent.owner.username, rent.client.username, rent.car.carnumber)
 
 }
 
