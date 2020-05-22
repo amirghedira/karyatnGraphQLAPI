@@ -8,8 +8,8 @@ const Response = class Response {
         this.message = message
         this.status = status;
         console.log(cars.length)
-        if (cars != null) {
-            if (cars.length) {
+        if (cars) {
+            if (cars.length !== undefined) {
                 if (cars.length > 0)
                     this.data.cars = cars
                 else {
