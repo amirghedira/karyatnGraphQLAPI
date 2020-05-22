@@ -411,7 +411,7 @@ exports.sendRequest = async (parent, args, req) => {
                     const rent = new Rent({
                         carid: car._id,
                         client: req.user._id,
-                        owner: args.owner,
+                        owner: args.ownerid,
                         totalprice: args.totalprice,
                         from: args.fromdate,
                         to: args.todate,
@@ -427,7 +427,7 @@ exports.sendRequest = async (parent, args, req) => {
                         date: new Date().toISOString(),
                         type: 'request'
                     }
-                    let manager = await User.findOneAndUpdate({ _id: args.owner }, {
+                    let manager = await User.findOneAndUpdate({ _id: args.ownerid }, {
                         $push: {
                             notifications: newNotification
                         }
