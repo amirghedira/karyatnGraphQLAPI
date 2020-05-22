@@ -4,6 +4,7 @@ const User = require('../models/User')
 const Rent = require('../models/Rent')
 const Car = require('../models/Car')
 const io = require('socket.io-client')
+const mongoose = require('mongoose')
 const socket = io('http://karyatn.amir-ghedira.com');
 const { SendRequest, rentEnded, requestAccepted, declinedRequest } = require('../utils/sendMail')
 const { Response, ResponsePaginated } = require('../types/Response')
