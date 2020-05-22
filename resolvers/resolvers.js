@@ -15,7 +15,6 @@ exports.getallCars = async (parent, args) => {
     try {
 
         const result = await Car.paginate({}, { page: +args.page, limit: +args.limit })
-        console.log(result.docs)
         return new ResponsePaginated(200, 'success', result.docs, null, null, { total: result.total, pages: result.pages })
 
     } catch (error) {
