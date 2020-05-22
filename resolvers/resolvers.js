@@ -432,11 +432,11 @@ exports.sendRequest = async (parent, args, req) => {
                             notifications: newNotification
                         }
                     })
-
+                    console.log(manager)
                     SendRequest(manager.email, manager.username, client.username, client._id)
                     socket.emit('sendnotification', { userid: rent.owner, notification: newNotification })
 
-                    if (req.body.subscribe && !manager.clients.includes(rent.client._id)) {
+                    if (args.subscribe && !manager.clients.includes(rent.client._id)) {
                         manager.clients.push(rent.client._id)
                         await manager.save()
                         res.status(201).json({ message: 'Request accepted successfully' })
