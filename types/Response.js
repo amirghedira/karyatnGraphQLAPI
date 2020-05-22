@@ -7,10 +7,9 @@ const Response = class Response {
 
         this.message = message
         this.status = status;
-        console.log(cars)
-        this.data.cars = cars ? !cars.length || cars.length === 0 ? [cars] : cars : null;
-        this.data.users = users ? !users.length || users.length === 0 ? [users] : users : null;
-        this.data.rents = rents ? !rents.length || rents.length === 0 ? [rents] : rents : null;
+        this.data.cars = cars ? !cars.length ? [cars] : cars : null;
+        this.data.users = users ? !users.length ? [users] : users : null;
+        this.data.rents = rents ? !rents.length ? [rents] : rents : null;
     }
 }
 
