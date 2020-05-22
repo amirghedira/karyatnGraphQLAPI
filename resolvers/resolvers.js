@@ -16,7 +16,7 @@ const imageName = require('../utils/imageName')
 exports.getallCars = async (parent, args) => {
     try {
 
-        const result = await Car.paginate({}, { page: +args.page, limit: +args.limit })
+        const result = await Car.paginate({}, { page: +args.page, limit: +args.limit, populate: [{ path: 'owner' }] })
         return new ResponsePaginated(200, 'success', result.docs, null, null, { total: result.total, pages: result.pages })
 
     } catch (error) {
@@ -41,7 +41,7 @@ exports.getAllRentedCars = async (parent, args) => {
 
     try {
 
-        const result = await Car.paginate({ state: false }, { page: +args.page, limit: +args.limit })
+        const result = await Car.paginate({ state: false }, { page: +args.page, limit: +args.limit, populate: [{ path: 'car' }, { path: 'owner' }, { path: 'client' }] })
 
         return new ResponsePaginated(200, 'success', result.docs, null, null, { total: result.total, pages: result.pages })
 
@@ -54,7 +54,7 @@ exports.getAllRentedCars = async (parent, args) => {
 exports.getAllFreeCars = async (parent, args) => {
     try {
 
-        const result = await Car.paginate({ state: true }, { page: +args.page, limit: +args.limit })
+        const result = await Car.paginate({ state: true }, { page: +args.page, limit: +args.limit, populate: [{ path: 'car' }, { path: 'owner' }, { path: 'client' }] })
         return new ResponsePaginated(200, 'success', result.docs, null, null, { total: result.total, pages: result.pages })
 
     } catch (error) {
@@ -192,7 +192,7 @@ exports.userLogin = async (parent, args) => {
                     email: user.email
                 }, process.env.JWT_SECRET_KEY)
 
-                return { token: token, ...user._doc, password: null }
+                return { token: token, user: { ...user._doc, password: 'null' } }
             }
 
             return new Error(404)
@@ -574,3 +574,303 @@ exports.endRent = async (rentid) => {
     rentEnded(rent.owner.email, rent.owner.username, rent.client.username, rent.carid.carnumber)
 
 }
+
+exports.deleteAllNotifications = async (parent, args, req) => {
+    if (req.isAuth) {
+        try {
+
+            await User.updateOne({ _id: req.user._id }, { $set: { notifications: [] } })
+            return new Response(200, 'notifications cleared')
+
+        } catch (error) {
+
+            return new Response(500, error.message)
+
+        }
+    }
+    return new Response(401, 'Auth failed')
+
+}
+
+exports.deleteNotification = async (parent, args, req) => {
+    if (req.isAuth) {
+        try {
+
+            const user = await User.findOne({ _id: req.user._id })
+            const index = user.notifications.findIndex(notification => { return notification._id.toString() === args._id })
+            user.notifications.splice(index, 1)
+            await user.save()
+            return new Response(200, 'notification deleted')
+
+        } catch (error) {
+
+            return new Response(500, error.message)
+        }
+    }
+    return new Response(401, 'Auth failed')
+
+}
+
+exports.deleteClient = async (parent, args, req) => {
+
+    if (req.isAuth) {
+        try {
+            const user = await User.findOne({ _id: req.user._id })
+            const clientindex = user.clients.findIndex(client => client.toString() === args._id)
+            if (clientindex >= 0) {
+                let newClients = user.clients;
+                newClients.splice(clientindex, 1);
+                user.clients = newClients;
+                await user.save()
+                return new Response(200, message)
+            }
+            return res.status(404).json({ message: 'user not found' })
+
+        }
+        catch (error) {
+            return new Response(500, error.message)
+
+        }
+    }
+    return new Response(401, 'Auth failed')
+
+
+}
+
+exports.sendComfirmation = async (parent, args) => {
+
+
+    try {
+        const user = await User.findOne({ email: args.email })
+        if (user) {
+            const token = jwt.sign(
+                {
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email
+                }, process.env.JWT_SECRET_KEY
+            )
+            WelcomeEmail(user.email, user.username, token)
+            return new Response(200, 'Email sent')
+        }
+        return new Response(404, 'User not found')
+
+
+    } catch (error) {
+        return new Response(500, error.message)
+
+    }
+
+
+}
+exports.userComfirmation = async (parent, args) => {
+
+    try {
+        const user = jwt.verify(args.token, process.env.JWT_SECRET_KEY)
+        await User.updateOne({ _id: user._id }, { $set: { confirmed: true } })
+        return new Response(200, 'user successfully confirmed')
+
+
+    } catch (error) {
+        return new Response(500, error.message)
+
+    }
+
+
+}
+exports.sendResetPassEmail = async (parent, args) => {
+    try {
+        const user = await User.findOne({ email: args.email });
+        if (user) {
+            const token = jwt.sign(
+                {
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email
+                }, process.env.JWT_SECRET_KEY
+            )
+
+            resetPasswordMail(user.email, user.username, token)
+            res.status(200).json({ message: 'Email sent' })
+            return new Response(200, 'Email sent')
+
+
+        }
+        return new Response(404, 'User with this email not found')
+
+
+    } catch (error) {
+        return new Response(500, error.message)
+
+    }
+
+}
+exports.confirmResetPass = async (parent, args, req) => {
+
+
+    try {
+        jwt.verify(args.token, process.env.JWT_SECRET_KEY);
+        return new Response(200, 'User is valide')
+
+    } catch (error) {
+
+        return new Response(401, 'user isn\'t valide')
+
+    }
+
+
+}
+exports.subscribeTo = async (parent, args, req) => {
+
+    if (isAuth) {
+
+        try {
+            const user = await User.findOne({ $and: [{ _id: args._id }, { access: 'a' }] });
+            if (!user.clients.includes(req.user._id)) {
+
+                user.clients.push(req.user._id)
+                user.save()
+                return new Response(200, 'subscription done')
+            }
+            return new Response(409, 'you are already subscribed')
+
+
+        } catch (error) {
+            return new Response(500, error.message)
+
+        }
+    }
+    return new Response(401, 'Auth failed')
+
+}
+exports.resetPassword = async (parent, args) => {
+
+    try {
+        const decodeduser = jwt.verify(args.token, process.env.JWT_SECRET_KEY)
+        const hashedpw = await bcrypt.hash(args.newPassword, 11);
+        await User.updateOne({ _id: decodeduser._id }, { $set: { password: hashedpw } })
+        return new Response(200, 'User password successfully updated')
+
+    } catch (error) {
+        return new Response(500, error.message)
+    }
+
+
+}
+exports.updateUserPass = async (parent, args, req) => {
+
+    if (isAuth) {
+
+        try {
+            const user = await User.findOne({ _id: req.user._id })
+            const result = await bcrypt.compare(args.oldPassword, user.password)
+            if (result) {
+                user.password = await bcrypt.hash(args.newPassword, 11);
+                await user.save()
+                return new Response(400, 'Password successfully updated')
+            }
+            return new Response(400, 'Passwords didn\'t match')
+
+
+        } catch (error) {
+            return new Response(500, error.message)
+
+        }
+    }
+    return new Response(401, 'Auth failed')
+
+}
+exports.updateUserInfo = async (parent, args, req) => {
+
+    if (isAuth) {
+
+        let ops = {};
+        for (let obj of args.fields) {
+            ops[obj.propName] = obj.value
+        }
+        try {
+            await User.updateOne({ _id: req.user._id }, { $set: ops })
+            return new Response(200, 'user updated successfully')
+
+
+        } catch (error) {
+            return new Response(500, error.message)
+
+        }
+    }
+    return new Response(401, 'Auth failed')
+
+}
+
+exports.markAsReadAllNotif = async (parent, args, req) => {
+
+    if (isAuth) {
+
+        try {
+            const user = await User.findOne({ _id: req.user._id });
+            const newNotifications = user.notifications;
+            newNotifications.forEach(notification => {
+                notification.read = true;
+            })
+            await User.updateOne({ _id: req.user._id }, { $set: { notifications: newNotifications } })
+            return new Response(200, 'notifications updated')
+
+
+        } catch (error) {
+            return new Response(500, error.message)
+
+        }
+    }
+    return new Response(401, 'Auth failed')
+
+}
+exports.markAsReadNotif = async (parent, args, req) => {
+
+    if (isAuth) {
+
+        try {
+            const user = await User.findOne({ _id: req.user._id });
+            const index = user.notifications.findIndex(notification => notification._id.toString() === args._id)
+            user.notifications[index].read = true;
+            await user.save()
+            return new Response(200, 'notification updated')
+
+
+        } catch (error) {
+            return new Response(500, error.message)
+
+        }
+    }
+    return new Response(401, 'Auth failed')
+
+}
+
+exports.updateUserImage = async (parent, args, req) => {
+
+    if (isAuth) {
+
+        try {
+            const user = await User.findOne({ _id: req.user._id })
+            if (user) {
+                cloudinary.uploader.destroy(ImageName(user.profileimg), (result, err) => {
+
+                })
+                user.profileimg = req.file.secure_url;
+                await user.save()
+                res.status(200).json({ message: 'user image updated successfully' })
+                return;
+
+            }
+            res.status(404).json({ message: 'user not found' })
+            return new Response(200, message)
+
+
+        } catch (error) {
+            return new Response(500, error.message)
+
+        }
+    }
+    return new Response(401, 'Auth failed')
+
+}
+

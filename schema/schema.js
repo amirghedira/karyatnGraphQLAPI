@@ -9,9 +9,10 @@ const {
     GraphQLInt,
     GraphQLInputObjectType,
 
+
 } = require('graphql')
 
-
+const { GraphQLUpload } = require('graphql-upload')
 const resolvers = require('../resolvers/resolvers');
 const { ResponseType, ResponsePaginateType } = require('../types/responseType');
 const { logedUserType, userInfoType } = require('../types/types');
@@ -126,7 +127,7 @@ const rootQuery = new GraphQLObjectType({
 
 })
 
-const updateCarProps = new GraphQLInputObjectType({
+const updateObjectInput = new GraphQLInputObjectType({
     name: 'updateCarProps',
     fields: () => ({
         propName: { type: GraphQLNonNull(GraphQLString) },
@@ -141,7 +142,7 @@ const rootMutation = new GraphQLObjectType({
             type: ResponseType,
             args: {
                 _id: { type: GraphQLNonNull(GraphQLString) },
-                fields: { type: GraphQLNonNull(GraphQLList(GraphQLNonNull(updateCarProps))) }
+                fields: { type: GraphQLNonNull(GraphQLList(GraphQLNonNull(updateObjectInput))) }
 
             },
             resolve: resolvers.updateCar
@@ -209,6 +210,104 @@ const rootMutation = new GraphQLObjectType({
             },
             resolve: resolvers.declinedRequest
         },
+        deleteAllNotifications: {
+            type: ResponseType,
+            resolve: resolvers.deleteAllNotifications
+        },
+        deleteNotification: {
+            type: ResponseType,
+            args: {
+                _id: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.deleteNotification
+        },
+        deleteClient: {
+            type: ResponseType,
+            args: {
+                _id: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.deleteClient
+        },
+        sendComfirmation: {
+            type: ResponseType,
+            args: {
+                email: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.sendComfirmation
+        },
+        userComfirmation: {
+            type: ResponseType,
+            args: {
+                token: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.userComfirmation
+        },
+        sendResetPassEmail: {
+            type: ResponseType,
+            args: {
+                email: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.sendResetPassEmail
+        },
+        confirmResetPass: {
+            type: ResponseType,
+            args: {
+                token: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.confirmResetPass
+        },
+        resetPassword: {
+            type: ResponseType,
+            args: {
+                newPassword: { type: GraphQLNonNull(GraphQLString) },
+                token: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.resetPassword
+        },
+        subscribeTo: {
+            type: ResponseType,
+            args: {
+                _id: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.subscribeTo
+        },
+        updateUserPass: {
+            type: ResponseType,
+            args: {
+                oldPassword: { type: GraphQLNonNull(GraphQLString) },
+                newPassword: { type: GraphQLNonNull(GraphQLString) },
+            },
+            resolve: resolvers.updateUserPass
+        },
+        updateUserInfo: {
+            type: ResponseType,
+            args: {
+                _id: { type: GraphQLNonNull(GraphQLString) },
+                fields: { type: GraphQLNonNull(GraphQLList(GraphQLNonNull(updateObjectInput))) }
+
+            },
+            resolve: resolvers.updateUserInfo
+        },
+        markAsReadAllNotif: {
+            type: ResponseType,
+            resolve: resolvers.markAsReadAllNotif
+        },
+        markAsReadNotif: {
+            type: ResponseType,
+            args: {
+                _id: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.markAsReadNotif
+        },
+        updateUserImage: {
+            type: ResponseType,
+            args: {
+                email: { type: GraphQLNonNull(GraphQLString) }
+            },
+            resolve: resolvers.updateUserImage
+        },
+
+
     })
 })
 
