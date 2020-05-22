@@ -8,16 +8,15 @@ const Response = class Response {
         this.message = message
         this.status = status;
         console.log(cars.length)
-        if (cars) {
+        if (cars != null) {
             if (cars.length) {
                 if (cars.length > 0)
                     this.data.cars = cars
                 else {
-                    console.log('1')
                     this.data.cars = null
                 }
             } else {
-                console.log('2')
+                console.log(cars)
                 this.data.cars = [cars]
             }
         } else {
