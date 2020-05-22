@@ -12,9 +12,12 @@ const Response = class Response {
             if (cars.length) {
                 if (cars.length > 0)
                     this.data.cars = cars
-                else
+                else {
+                    console.log('1')
                     this.data.cars = null
+                }
             } else {
+                console.log('2')
                 this.data.cars = [cars]
             }
         } else {
