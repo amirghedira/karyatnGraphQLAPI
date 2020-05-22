@@ -59,7 +59,7 @@ exports.newCarPosted = async (mail, username, carid, agencyname) => {
 
 }
 //todos
-exports.SendRequest = async (mail, username, clientname, clientid) => {
+exports.SendRequest = async (mail, username, clientname, client) => {
     const template = fs.readFileSync('./views/email/request.hjs', 'utf-8')
     const compiledTemplate = hjs.compile(template)
     try {
@@ -69,7 +69,7 @@ exports.SendRequest = async (mail, username, clientname, clientid) => {
             subject: `${clientname} vous a envoyer une demande de location`,
             html: compiledTemplate.render({
                 username: username,
-                clientlink: `${process.env.DOMAIN}/profile/${clientid}`,
+                clientlink: `${process.env.DOMAIN}/profile/${client}`,
                 clientname: clientname,
                 requestslink: `${process.env.DOMAIN}/admincp/ajout-location`
             })

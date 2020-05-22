@@ -110,7 +110,7 @@ exports.getCarHistory = async (parent, args, req) => {
         try {
 
             const carHistory = await Rent.find({ $and: [{ carid: args.carid }, { ended: true }] }).populate([{
-                path: 'clientid'
+                path: 'client'
             }, { path: 'carid' }, { path: 'owner' }])
 
             return new Response(200, 'success', null, null, carHistory)
@@ -126,7 +126,7 @@ exports.getActiveRents = async (parent, args, req) => {
     if (req.isAuth) {
         try {
             const activeRents = await Rent.find({ $and: [{ owner: req.user._id }, { active: true }] }).populate([{
-                path: 'clientid'
+                path: 'client'
             }, { path: 'carid' }, { path: 'owner' }])
 
             return new Response(200, 'success', null, null, activeRents)
@@ -145,7 +145,7 @@ exports.getUnvalidatedRents = async (parent, args, req) => {
         try {
 
             const unvalidatedRents = await Rent.find({ $and: [{ owner: req.user._id }, { validated: false }] }).populate([{
-                path: 'clientid'
+                path: 'client'
             }, { path: 'carid' }, { path: 'owner' }])
             return new Response(200, 'success', null, null, unvalidatedRents)
         } catch (error) {
@@ -162,7 +162,7 @@ exports.getReservations = async (parent, args, req) => {
 
             const reservations = await Rent.find({ $and: [{ owner: req.user._id }, { validated: true }, { ended: false }] })
                 .populate([{
-                    path: 'clientid'
+                    path: 'client'
                 }, { path: 'carid' }, { path: 'owner' }])
 
             return new Response(200, 'success', null, null, reservations)
@@ -298,7 +298,7 @@ exports.getArchive = async (parent, args, req) => {
     if (req.isAuth) {
         try {
             const archives = await Rent.find({ $and: [{ owner: req.user._id }, { ended: true }] })
-                .populate([{ path: 'clientid' }, { path: 'owner' }, { path: 'carid' }])
+                .populate([{ path: 'client' }, { path: 'owner' }, { path: 'carid' }])
             return new Response(200, 'success', null, null, archives)
         } catch (error) {
             return new Response(500, error.message)
@@ -368,13 +368,13 @@ deleteReservation = async (parent, args, req) => {
                     type: 'reservationdeleted',
                     read: false
                 }
-                await User.updateOne({ _id: reservation.clientid }, {
+                await User.updateOne({ _id: reservation.client }, {
                     $push: {
                         notifications: newNotifcation
                     }
                 })
                 await Rent.deleteOne({ $and: [{ _id: args._id }, { owner: req.user._id }] })
-                socket.emit('sendnotification', { userid: reservation.clientid, notification: newNotifcation })
+                socket.emit('sendnotification', { userid: reservation.client, notification: newNotifcation })
                 return new Response(409, 'reservation deleted')
 
             }
@@ -407,7 +407,7 @@ exports.sendRequest = async (parent, args, req) => {
                 if (validDate.state) {
                     const rent = new Rent({
                         carid: car._id,
-                        clientid: req.user._id,
+                        client: req.user._id,
                         owner: args.owner,
                         totalprice: args.totalprice,
                         from: args.fromdate,
@@ -433,8 +433,8 @@ exports.sendRequest = async (parent, args, req) => {
                     SendRequest(manager.email, manager.username, client.username, client._id)
                     socket.emit('sendnotification', { userid: rent.owner, notification: newNotification })
 
-                    if (req.body.subscribe && !manager.clients.includes(rent.clientid._id)) {
-                        manager.clients.push(rent.clientid._id)
+                    if (req.body.subscribe && !manager.clients.includes(rent.client._id)) {
+                        manager.clients.push(rent.client._id)
                         await manager.save()
                         res.status(201).json({ message: 'Request accepted successfully' })
                         return;
@@ -461,7 +461,7 @@ exports.validateRequest = async (parent, args, req) => {
     if (req.isAuth) {
         try {
             let rent = await Rent.findOne({ _id: args._id }).populate([{
-                path: 'clientid'
+                path: 'client'
             }, { path: 'carid' }, { path: 'owner' }])
             rent.validated = true;
             await rent.save()
@@ -473,15 +473,15 @@ exports.validateRequest = async (parent, args, req) => {
                 read: false,
                 date: new Date().toISOString()
             }
-            await User.updateOne({ _id: rent.clientid }, {
+            await User.updateOne({ _id: rent.client }, {
                 $push: {
                     notifications: NewNotification
                 }
             })
-            socket.emit('sendnotification', { userid: rent.clientid._id, notification: NewNotification })
+            socket.emit('sendnotification', { userid: rent.client._id, notification: NewNotification })
             setTimeout(() => activateRentHandler(rent._id), new Date(rent.from).getTime() - new Date().getTime());
             setTimeout(() => endRentHandler(rent._id), new Date(rent.to).getTime() - new Date().getTime());
-            requestAccepted(rent.clientid.email, rent.clientid.username, rent.owner._id, rent.carid.carnumber, rent.daterent, rent.owner.agencename)
+            requestAccepted(rent.client.email, rent.client.username, rent.owner._id, rent.carid.carnumber, rent.daterent, rent.owner.agencename)
 
 
             return new Response(200, 'Request accepted successfully')
@@ -502,7 +502,7 @@ exports.declineRequest = async (parent, args, req) => {
         try {
 
             const rent = await Rent.findById(args._id).populate([{
-                path: 'clientid'
+                path: 'client'
             }, { path: 'carid' }, { path: 'owner' }])
             const newNotifcation = {
                 _id: new mongoose.Types.ObjectId(),
@@ -511,9 +511,9 @@ exports.declineRequest = async (parent, args, req) => {
                 type: 'declinedrequest',
                 read: false
             }
-            await User.updateOne({ _id: rent.clientid._id }, { $push: { notifications: newNotifcation } })
-            declinedRequest(rent.clientid.email, rent.clientid.username, rent.owner._id, rent.carid._id)
-            socket.emit('sendnotification', { userid: rent.clientid._id, notification: newNotifcation })
+            await User.updateOne({ _id: rent.client._id }, { $push: { notifications: newNotifcation } })
+            declinedRequest(rent.client.email, rent.client.username, rent.owner._id, rent.carid._id)
+            socket.emit('sendnotification', { userid: rent.client._id, notification: newNotifcation })
             await Rent.deleteOne({ _id: req.body.rentid })
 
             return new Response(200, 'Request declined successfully')
@@ -532,7 +532,7 @@ exports.endRent = async (rentid) => {
 
     const rent = await Rent.findById(rentid)
         .populate([{
-            path: 'clientid'
+            path: 'client'
         }, { path: 'carid' }, { path: 'owner' }])
     rent.active = false;
     rent.ended = true;
@@ -545,15 +545,15 @@ exports.endRent = async (rentid) => {
         read: false,
         date: new Date().toISOString()
     }
-    await User.updateOne({ _id: rent.clientid._id }, {
+    await User.updateOne({ _id: rent.client._id }, {
         $push: {
             notifications: clientNewNotification
         }
     })
-    socket.emit('sendnotification', { userid: rent.clientid._id, notification: clientNewNotification })
+    socket.emit('sendnotification', { userid: rent.client._id, notification: clientNewNotification })
     const managerNewNotification = {
         _id: new mongoose.Types.ObjectId(),
-        userid: rent.clientid,
+        userid: rent.client,
         carid: rent.carid,
         type: 'rentended',
         read: false,
@@ -568,7 +568,7 @@ exports.endRent = async (rentid) => {
 
     await Car.updateOne({ _id: rent.carid }, { $set: { state: true } })
 
-    rentEnded(rent.clientid.email, rent.clientid.username, manager._id, car._id, car.carnumber)
-    rentEnded(rent.owner.email, rent.owner.username, rent.clientid.username, rent.carid.carnumber)
+    rentEnded(rent.client.email, rent.client.username, manager._id, car._id, car.carnumber)
+    rentEnded(rent.owner.email, rent.owner.username, rent.client.username, rent.carid.carnumber)
 
 }
