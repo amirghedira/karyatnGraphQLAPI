@@ -395,7 +395,7 @@ exports.sendRequest = async (parent, args, req) => {
     if (req.isAuth) {
 
         try {
-            const car = await Car.findOne({ _id: req.body.carid })
+            const car = await Car.findOne({ _id: args.carid })
             if (car) {
                 const rents = await Rent.find({ carid: car._id })
                 let validDate = { state: true, fromdate: null, todate: null };
