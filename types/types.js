@@ -36,7 +36,7 @@ const userType = new GraphQLObjectType({
         licencenum: { type: GraphQLString },
         birthday: { type: GraphQLNonNull(GraphQLString), },
         address: { type: GraphQLNonNull(GraphQLString), },
-        profileimg: { type: GraphQLNonNull(GraphQLString) },
+        profileimg: { type: GraphQLString },
         ncinimg: { type: GraphQLString },
         agencename: { type: GraphQLString },
         joindate: { type: GraphQLNonNull(GraphQLString), },
