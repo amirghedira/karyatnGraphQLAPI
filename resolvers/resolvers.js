@@ -779,7 +779,7 @@ exports.confirmResetPass = async (parent, args, req) => {
 }
 exports.subscribeTo = async (parent, args, req) => {
 
-    if (isAuth) {
+    if (req.isAuth) {
 
         try {
             const user = await User.findOne({ $and: [{ _id: args._id }, { access: 'a' }] });
@@ -816,7 +816,7 @@ exports.resetPassword = async (parent, args) => {
 }
 exports.updateUserPass = async (parent, args, req) => {
 
-    if (isAuth) {
+    if (req.isAuth) {
 
         try {
             const user = await User.findOne({ _id: req.user._id })
@@ -839,7 +839,7 @@ exports.updateUserPass = async (parent, args, req) => {
 }
 exports.updateUserInfo = async (parent, args, req) => {
 
-    if (isAuth) {
+    if (req.isAuth) {
 
         let ops = {};
         for (let obj of args.fields) {
@@ -861,7 +861,7 @@ exports.updateUserInfo = async (parent, args, req) => {
 
 exports.markAsReadAllNotif = async (parent, args, req) => {
 
-    if (isAuth) {
+    if (req.isAuth) {
 
         try {
             const user = await User.findOne({ _id: req.user._id });
@@ -883,7 +883,7 @@ exports.markAsReadAllNotif = async (parent, args, req) => {
 }
 exports.markAsReadNotif = async (parent, args, req) => {
 
-    if (isAuth) {
+    if (req.isAuth) {
 
         try {
             const user = await User.findOne({ _id: req.user._id });
@@ -904,7 +904,7 @@ exports.markAsReadNotif = async (parent, args, req) => {
 
 exports.updateUserImage = async (parent, args, req) => {
 
-    if (isAuth) {
+    if (req.isAuth) {
 
         try {
             const user = await User.findOne({ _id: req.user._id })
