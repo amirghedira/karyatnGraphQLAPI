@@ -620,7 +620,7 @@ exports.endRent = async (parent, args, req) => {
     if (req.isAuth) {
 
         try {
-            resolvers.endRentHandler(args._id)
+            endRentHandler(args._id)
             return new Response(200, 'rent ended')
         } catch (error) {
             return new Response(500, error.message)
