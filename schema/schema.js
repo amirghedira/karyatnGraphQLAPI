@@ -222,12 +222,12 @@ const rootMutation = new GraphQLObjectType({
             },
             resolve: resolvers.sendComfirmation
         },
-        userComfirmation: {
+        userConfirmation: {
             type: ResponseType,
             args: {
                 token: { type: GraphQLNonNull(GraphQLString) }
             },
-            resolve: resolvers.userComfirmation
+            resolve: resolvers.userConfirmation
         },
         sendResetPassEmail: {
             type: ResponseType,

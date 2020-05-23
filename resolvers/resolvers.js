@@ -721,7 +721,7 @@ exports.sendComfirmation = async (parent, args) => {
 
 
 }
-exports.userComfirmation = async (parent, args) => {
+exports.userConfirmation = async (parent, args) => {
 
     try {
         const user = jwt.verify(args.token, process.env.JWT_SECRET_KEY)
