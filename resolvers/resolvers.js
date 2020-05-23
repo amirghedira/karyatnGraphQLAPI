@@ -345,7 +345,7 @@ exports.getUserInfo = async (parent, args, req) => {
     if (req.isAuth) {
         try {
             let info = {};
-            const user = await User.findOne({ _id: req.user._id }).select('-password')
+            const user = await User.findOne({ $and: [{ _id: req.user._id }, { access: 'a' }] }).select('-password')
             info.carscount = user.cars.length;
             info.clientscount = user.clients.length
             let userRents = await Rent.find({ $and: [{ owner: req.user._id }, { validated: true }] })
