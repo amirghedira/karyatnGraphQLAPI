@@ -449,7 +449,6 @@ exports.deleteCar = async (parent, args, req) => {
 
 deleteReservation = async (parent, args, req) => {
     if (req.isAuth) {
-
         try {
             const reservation = await Rent.findOne({ $and: [{ _id: args._id }, { owner: req.user._id }] })
 
@@ -468,7 +467,9 @@ deleteReservation = async (parent, args, req) => {
                 })
                 await Rent.deleteOne({ $and: [{ _id: args._id }, { owner: req.user._id }] })
                 socket.emit('sendnotification', { userid: reservation.client, notification: newNotifcation })
-                return new Response(409, 'reservation deleted')
+                console.log('deleted')
+
+                return new Response(200, 'reservation deleted')
 
             }
             return new Response(409, 'reservation is active')
