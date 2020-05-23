@@ -84,7 +84,7 @@ const rootQuery = new GraphQLObjectType({
         },
         reservations: {
             type: ResponseType,
-            resolve: resolvers.getReservation
+            resolve: resolvers.getReservations
         },
         login: {
             type: logedUserType,
