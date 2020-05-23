@@ -318,7 +318,7 @@ exports.getActiveUser = async (parent, args, req) => {
             const activeUser = await User.findOne({ _id: req.user._id })
                 .populate([{
                     path: 'notifications.userid'
-                }, { path: 'notifications.carid' }])
+                }, { path: 'notifications.carid' }, { path: 'clients' }, { path: 'cars' }])
 
             return new Response(200, 'success', null, activeUser)
         } catch (error) {
