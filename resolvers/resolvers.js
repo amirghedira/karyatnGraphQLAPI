@@ -447,7 +447,7 @@ exports.deleteCar = async (parent, args, req) => {
     return new Response(401, 'Auth failed')
 }
 
-deleteReservation = async (parent, args, req) => {
+exports.deleteReservation = async (parent, args, req) => {
     if (req.isAuth) {
         try {
             const reservation = await Rent.findOne({ $and: [{ _id: args._id }, { owner: req.user._id }] })
