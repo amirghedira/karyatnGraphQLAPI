@@ -201,14 +201,14 @@ const rootMutation = new GraphQLObjectType({
             },
             resolve: resolvers.validateRequest
         },
-        declinedRequest: {
+        declineRequest: {
 
             type: ResponseType,
             args: {
 
                 _id: { type: GraphQLNonNull(GraphQLString) }
             },
-            resolve: resolvers.declinedRequest
+            resolve: resolvers.declineRequest
         },
         deleteAllNotifications: {
             type: ResponseType,

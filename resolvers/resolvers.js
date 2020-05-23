@@ -439,7 +439,6 @@ exports.sendRequest = async (parent, args, req) => {
                         manager.clients.push(rent.client._id)
                         await manager.save()
                         return new Response(201, 'Request successfully sent')
-                        return;
 
                     }
                     return new Response(201, 'Request successfully sent')
