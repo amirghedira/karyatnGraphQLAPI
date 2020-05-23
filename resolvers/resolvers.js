@@ -730,7 +730,7 @@ exports.userConfirmation = async (parent, args) => {
 
 
     } catch (error) {
-        return new Response(500, error.message)
+        return new Response(401, error.message)
 
     }
 
