@@ -429,7 +429,7 @@ exports.deleteCar = async (parent, args, req) => {
 
                     cloudinary.uploader.destroy(imageName(image), (result, err) => {
                         if (err)
-                            res.status(500).json({ error: err })
+                            return new Response(500, err.message)
                     });
                 })
                 user.cars.splice(index, 1)
@@ -680,7 +680,8 @@ exports.deleteClient = async (parent, args, req) => {
                 await user.save()
                 return new Response(200, message)
             }
-            return res.status(404).json({ message: 'user not found' })
+            return new Response(404, 'client not found')
+
 
         }
         catch (error) {
@@ -747,7 +748,6 @@ exports.sendResetPassEmail = async (parent, args) => {
             )
 
             resetPasswordMail(user.email, user.username, token)
-            res.status(200).json({ message: 'Email sent' })
             return new Response(200, 'Email sent')
 
 
@@ -913,12 +913,10 @@ exports.updateUserImage = async (parent, args, req) => {
                 })
                 user.profileimg = req.file.secure_url;
                 await user.save()
-                res.status(200).json({ message: 'user image updated successfully' })
-                return;
+                return new Response(200, 'user image updated successfully')
 
             }
-            res.status(404).json({ message: 'user not found' })
-            return new Response(200, message)
+            return new Response(404, 'user not found')
 
 
         } catch (error) {
