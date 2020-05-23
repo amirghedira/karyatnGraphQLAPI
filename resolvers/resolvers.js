@@ -11,8 +11,98 @@ const { Response, ResponsePaginated } = require('../types/Response')
 const cloudinary = require('../utils/cloudinary')
 const imageName = require('../utils/imageName')
 
+const endRentHandler = async (rentid) => {
+
+    //tofix
+
+    const rent = await Rent.findById(rentid)
+        .populate([{
+            path: 'client'
+        }, { path: 'car' }, { path: 'owner' }])
+    rent.active = false;
+    rent.ended = true;
+    await rent.save();
+    const clientNewNotification = {
+        _id: new mongoose.Types.ObjectId(),
+        userid: rent.owner,
+        carid: rent.car,
+        type: 'rentended',
+        read: false,
+        date: new Date().toISOString()
+    }
+    await User.updateOne({ _id: rent.client._id }, {
+        $push: {
+            notifications: clientNewNotification
+        }
+    })
+    socket.emit('sendnotification', { userid: rent.client._id, notification: clientNewNotification })
+    const managerNewNotification = {
+        _id: new mongoose.Types.ObjectId(),
+        userid: rent.client,
+        carid: rent.car,
+        type: 'rentended',
+        read: false,
+        date: new Date().toISOString()
+    }
+    await User.updateOne({ _id: rent.owner._id }, {
+        $push: {
+            notifications: managerNewNotification
+        }
+    })
+    socket.emit('sendnotification', { userid: rent.owner._id, notification: managerNewNotification })
+
+    await Car.updateOne({ _id: rent.car }, { $set: { state: true } })
+
+    rentEnded(rent.client.email, rent.client.username, manager._id, car._id, car.carnumber)
+    rentEnded(rent.owner.email, rent.owner.username, rent.client.username, rent.car.carnumber)
+
+}
+
+const activateRentHandler = async (rentid) => {
+    try {
+
+        let rent = await Rent.findOne({ _id: rentid })
+            .populate([{
+                path: 'client'
+            }, { path: 'car' }, { path: 'owner' }])
+
+        rent.active = true
+        await rent.save()
+        await Car.updateOne({ _id: rent.car._id }, { $set: { state: false } })
+        const ownerNotification = {
+            _id: new mongoose.Types.ObjectId(),
+            userid: rent.client,
+            car: rent.car,
+            type: 'activatedrent',
+            read: false
+        }
+        const clientNotification = {
+            _id: new mongoose.Types.ObjectId(),
+            userid: rent.owner,
+            car: rent.car,
+            type: 'activatedrent',
+            read: false
+
+        }
+        await User.updateOne({ _id: rent.owner._id }, {
+            $push: {
+                notifications: ownerNotification
+            }
+        })
+        await User.updateOne({ _id: rent.client._id }, {
+            $push: {
+                notifications: clientNotification
+            }
+        })
+        socket.emit('sendnotification', { userid: rent.owner._id, notification: ownerNotification })
+        socket.emit('sendnotification', { userid: rent.client._id, notification: clientNotification })
 
 
+    } catch (error) {
+
+        console.log(error)
+    }
+}
 
 exports.getallCars = async (parent, args) => {
     try {
@@ -526,53 +616,20 @@ exports.declineRequest = async (parent, args, req) => {
     }
     return new Response(401, 'Auth failed')
 }
+exports.endRent = async (parent, args, req) => {
+    if (req.isAuth) {
 
-exports.endRent = async (rentid) => {
-
-    //tofix
-
-    const rent = await Rent.findById(rentid)
-        .populate([{
-            path: 'client'
-        }, { path: 'car' }, { path: 'owner' }])
-    rent.active = false;
-    rent.ended = true;
-    await rent.save();
-    const clientNewNotification = {
-        _id: new mongoose.Types.ObjectId(),
-        userid: rent.owner,
-        carid: rent.car,
-        type: 'rentended',
-        read: false,
-        date: new Date().toISOString()
-    }
-    await User.updateOne({ _id: rent.client._id }, {
-        $push: {
-            notifications: clientNewNotification
+        try {
+            resolvers.endRentHandler(args._id)
+            return new Response(200, 'rent ended')
+        } catch (error) {
+            return new Response(500, error.message)
         }
-    })
-    socket.emit('sendnotification', { userid: rent.client._id, notification: clientNewNotification })
-    const managerNewNotification = {
-        _id: new mongoose.Types.ObjectId(),
-        userid: rent.client,
-        carid: rent.car,
-        type: 'rentended',
-        read: false,
-        date: new Date().toISOString()
     }
-    await User.updateOne({ _id: rent.owner._id }, {
-        $push: {
-            notifications: managerNewNotification
-        }
-    })
-    socket.emit('sendnotification', { userid: rent.owner._id, notification: managerNewNotification })
-
-    await Car.updateOne({ _id: rent.car }, { $set: { state: true } })
-
-    rentEnded(rent.client.email, rent.client.username, manager._id, car._id, car.carnumber)
-    rentEnded(rent.owner.email, rent.owner.username, rent.client.username, rent.car.carnumber)
+    return new Response(401, 'Auth failed')
 
 }
+
 
 exports.deleteAllNotifications = async (parent, args, req) => {
     if (req.isAuth) {

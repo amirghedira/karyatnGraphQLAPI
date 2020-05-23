@@ -166,20 +166,7 @@ const rootMutation = new GraphQLObjectType({
             args: {
                 _id: { type: GraphQLNonNull(GraphQLString) }
             },
-            resolve: (parent, args, req) => {
-                if (req.isAuth) {
-
-                    try {
-                        resolvers.endRent(args._id)
-                        res.status(200).json({ message: 'rent ended' })
-                        return new Response(200, 'rent ended')
-                    } catch (error) {
-                        return new Response(500, error.message)
-                    }
-                }
-                return new Response(401, 'Auth failed')
-
-            }
+            resolve: resolvers.endRent
         },
         sendRequest: {
             type: ResponseType,
