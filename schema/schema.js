@@ -106,7 +106,7 @@ const rootQuery = new GraphQLObjectType({
             resolve: resolvers.getActiveUser
         },
         managers: {
-            type: ResponseType,
+            type: ResponsePaginateType,
             args: {
                 page: { type: GraphQLNonNull(GraphQLInt) },
                 limit: { type: GraphQLNonNull(GraphQLInt) }

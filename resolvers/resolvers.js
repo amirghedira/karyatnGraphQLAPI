@@ -108,7 +108,7 @@ exports.getallCars = async (parent, args) => {
     try {
 
         const result = await Car.paginate({}, { page: +args.page, limit: +args.limit, populate: [{ path: 'owner' }] })
-        return new ResponsePaginated(200, 'success', result.docs, null, null, { total: result.total, pages: result.pages })
+        return new ResponsePaginated(200, 'success', result.docs, null, null, { total: +result.total, pages: +result.pages })
 
     } catch (error) {
         return new ResponsePaginated(500, error.message)
@@ -332,12 +332,12 @@ exports.getActiveUser = async (parent, args, req) => {
 exports.getManagers = async (parent, args) => {
     try {
 
-        const { docs } = await User.paginate({ access: 'a' },
+        const { docs, pages, total } = await User.paginate({ access: 'a' },
             { page: +args.page, limit: +args.limit, populate: [{ path: 'cars' }, { path: 'clients' }] })
-        return new Response(200, 'success', null, docs)
+        return new ResponsePaginated(200, 'success', null, docs, null, { total: +total, pages: +pages })
 
     } catch (error) {
-        return new Response(500, error.message)
+        return new ResponsePaginated(500, error.message)
     }
 }
 
