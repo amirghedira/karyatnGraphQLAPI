@@ -9,8 +9,9 @@ const {
     GraphQLInt,
     GraphQLInputObjectType,
 
-
 } = require('graphql')
+
+
 
 const { GraphQLUpload } = require('graphql-upload')
 const resolvers = require('../resolvers/resolvers');
@@ -137,6 +138,7 @@ const updateObjectInput = new GraphQLInputObjectType({
 const rootMutation = new GraphQLObjectType({
 
     name: 'rootMutation',
+
     fields: () => ({
         updateCar: {
             type: ResponseType,
@@ -289,7 +291,7 @@ const rootMutation = new GraphQLObjectType({
         updateUserImage: {
             type: ResponseType,
             args: {
-                email: { type: GraphQLNonNull(GraphQLString) }
+                image: { type: GraphQLUpload }
             },
             resolve: resolvers.updateUserImage
         },
@@ -301,5 +303,8 @@ const rootMutation = new GraphQLObjectType({
 
 module.exports = new GraphQLSchema({
     query: rootQuery,
+    typeDefs: /* GraphQL */ `
+    scalar Upload
+  `,
     mutation: rootMutation
 })

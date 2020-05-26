@@ -6,6 +6,7 @@ const mongoose = require('mongoose')
 const checkAuth = require('./utils/checkAuth')
 const app = express();
 const { ResponsePaginated } = require('./types/Response')
+const { graphqlUploadExpress } = require('graphql-upload');
 
 
 mongoose.connect(process.env.MONGO_INFO, {
@@ -15,7 +16,8 @@ mongoose.connect(process.env.MONGO_INFO, {
 
 app.use(cors())
 app.use(checkAuth)
-app.use('/graphql', graphqlHTTP({
+app.use('/graphql', graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }), graphqlHTTP({
+
     schema: schema,
     graphiql: true
 

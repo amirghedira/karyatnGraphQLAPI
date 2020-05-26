@@ -6,7 +6,7 @@ const Car = require('../models/Car')
 const io = require('socket.io-client')
 const mongoose = require('mongoose')
 const socket = io('http://karyatn.amir-ghedira.com');
-const { SendRequest, rentEnded, requestAccepted, declinedRequest, resetPasswordMail } = require('../utils/sendMail')
+const { SendRequest, rentEnded, requestAccepted, declinedRequest, resetPasswordMail, WelcomeEmail } = require('../utils/sendMail')
 const { Response, ResponsePaginated } = require('../types/Response')
 const cloudinary = require('../utils/cloudinary')
 const imageName = require('../utils/imageName')
@@ -902,30 +902,10 @@ exports.markAsReadNotif = async (parent, args, req) => {
 
 }
 
-exports.updateUserImage = async (parent, args, req) => {
-
-    if (req.isAuth) {
-
-        try {
-            const user = await User.findOne({ _id: req.user._id })
-            if (user) {
-                cloudinary.uploader.destroy(ImageName(user.profileimg), (result, err) => {
-
-                })
-                user.profileimg = req.file.secure_url;
-                await user.save()
-                return new Response(200, 'user image updated successfully')
-
-            }
-            return new Response(404, 'user not found')
-
-
-        } catch (error) {
-            return new Response(500, error.message)
-
-        }
-    }
+exports.updateUserImage = async (parent, args) => {
+    console.log('hey')
+    console.log(args.image)
     return new Response(401, 'Auth failed')
-
 }
+
 
