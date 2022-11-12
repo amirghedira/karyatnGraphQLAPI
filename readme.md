@@ -57,6 +57,3 @@ This API exposes these mutations (a mutation in GraphQL means a request that aff
  * `markAsReadAllNotif`: mark all current user notifications as read.
  * `markAsReadNotif`: mark a current user notification as read based on the ID.
  * `updateUserImage`: update the current user profile image.
-
-
-* `archive`: 
