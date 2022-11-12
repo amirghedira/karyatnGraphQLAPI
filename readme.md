@@ -22,11 +22,10 @@ This API exposes these queries (a query in GraphQL means a request that doesnt s
 * `carHistory`: returns all previous rents related to a specific car.
 * `activeRents`: returns all active rents of the manager (accessible by the manager only).
 * `unvalidatedRents`: returns all rents of the manager which was not validated by him (accessible by the manager only).
-* `reservations`: returns client reservations to the manager (accessible by the manager only)
+* `reservations`: returns client reservations to the manager (accessible by the manager only).
 * `login`: a query to authenticate users and returns an access token if the login succeeded.
 * `user`: return a specific user based on an ID.
 * `activeUser`: returns the connected user (based on the access token).
 * `managers`: returns a list of managers (owners of the cars published to be rented).
 * `userInformations`: returns the current user's information (username, email, address etc...).
-
-*
+* `archive`: returns all rents which has ended to the manager (accessible by the manager only).
