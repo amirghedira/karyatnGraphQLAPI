@@ -7,7 +7,7 @@ Note that all the functionalities are the same with the previous API (made with 
 ## Database
 To store this application data we have used mongoDB as our database along with mongoose which is an npm package that allow as to interact with mongoDB.
 
-# Queries
+## Queries
 This API exposes these queries (a query in GraphQL means a request that doesnt save or store any thing on the database usually for getting data):
 
 ![graphql queries](https://amirplatform.s3.eu-central-1.amazonaws.com/project/gnw1ytn76bor1agfdnpc.png)
@@ -29,3 +29,34 @@ This API exposes these queries (a query in GraphQL means a request that doesnt s
 * `managers`: returns a list of managers (owners of the cars published to be rented).
 * `userInformations`: returns the current user's information (username, email, address etc...).
 * `archive`: returns all rents which has ended to the manager (accessible by the manager only).
+
+## Mutations
+This API exposes these mutations (a mutation in GraphQL means a request that affect the database usually for saving, deleting or updating data):
+
+![mutations_1](https://amirplatform.s3.eu-central-1.amazonaws.com/project/sodkv2eogadbgugh8sg4.png)
+![mutations_2](https://amirplatform.s3.eu-central-1.amazonaws.com/project/iyh4xa4ls4pmvpzz6gzq.png)
+
+* `updateCar`:  updates a specific car based on the ID
+* `deleteCar`:  deletes a specific  car based on the ID
+* `deleteReservation`:  delete a specific car reservation based on the ID
+* `endRent`:  mark the rent as ended (when the client returns the vehicule to the owner).
+* `sendRequest`: send a request to the owner of the car to make a reservation.
+* `validateRequest`: mark a client request as accepted.
+* `declineRequest`: mark a client request as declined.
+* `deleteAllNotifications`:  delete all current user notifications.
+* `deleteNotification`:  delete a specific notification based on the ID.
+* `deleteClient`:  delete a client based on the ID (the client is automatically added to the manager once the client rent a car).
+* `sendConfirmation`:  send a confirmation email to the user to confirm his account after creating it
+* `userConfirmation`: confirm a user account based on a token (usually this token is present on the email sent to the user) 
+* `sendResetPassEmail`:  send a reset password email to the user.
+* `confirmResetPass`:  confirm whether the user is legitimate to process a reset password based on a token (usually this token is present on the email sent to the user)
+* `resetPassword`: reset a user password (a token needs to be provided to validate the user legitimacy).
+* `subscribeTo`: allows a user to subscribe to a manager (to receive notification and emails about cars availability). 
+* `updateUserPass`: update current user password.
+ * `updateUserInfo`: update current user's informations such as email, username and address.
+ * `markAsReadAllNotif`: mark all current user notifications as read.
+ * `markAsReadNotif`: mark a current user notification as read based on the ID.
+ * `updateUserImage`: update the current user profile image.
+
+
+* `archive`: 
