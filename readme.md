@@ -4,7 +4,6 @@ This is another versions of the previous karyatn API made with GraphQL.
 Note that all the functionalities are the same with the previous API (made with `express.js`) and the goal here is to use GraphQL to handle API queries. You can find more information about the previous version of this API [here](https://www.amirghedira.com/project/Karyatn%20Backend/Nodejs%20-%20Express%20-%20MongoDB/60d7487ad7e12a0017340e70)
 
 # Launch the project
-## backend
 To launch the project, you have to first add a `.env` folder in the root directory that will hold the environment variables of the backend. You can find a `.env.example` folder as reference for the environment variables used.
 Note that you need a cloudinary account to used in the backend as storage service.
 
