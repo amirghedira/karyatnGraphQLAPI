@@ -19,7 +19,7 @@ npm start
 ```
 To run the backend server in development mode, run:
 ``` bash
-npm start:dev
+npm run dev
 ```
 Note that the server will listen on port `3000`
 
@@ -28,7 +28,7 @@ Note that the server will listen on port `3000`
 To store this application data we have used mongoDB as our database along with mongoose which is an npm package that allow as to interact with mongoDB.
 
 ## Queries
-This API exposes these queries (a query in GraphQL means a request that doesnt save or store any thing on the database usually for getting data):
+This API exposes these queries (a query in GraphQL means a request that doesn't save or store any thing on the database usually for getting data):
 
 ![graphql queries](https://amirplatform.s3.eu-central-1.amazonaws.com/project/gnw1ytn76bor1agfdnpc.png)
 
