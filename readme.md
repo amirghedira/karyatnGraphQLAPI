@@ -22,7 +22,7 @@ To run the backend server in development mode, run:
 ``` bash
 npm start:dev
 ```
-Note that the server will listen on port `5000`
+Note that the server will listen on port `3000`
 
 # Features
 ## Database
